@@ -1,0 +1,212 @@
+openapi: 3.0.3
+info:
+  title: TripMate MVP API
+  version: 0.1.0
+  description: Core API draft for TripMate mini-program and ops admin.
+servers:
+  - url: https://api.tripmate.example.com/api/v1
+paths:
+  /auth/wechat/login:
+    post:
+      summary: WeChat login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code:
+                  type: string
+      responses:
+        "200":
+          description: Login success
+  /users/personality-test:
+    post:
+      summary: Submit personality test
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answers]
+              properties:
+                answers:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      question_id:
+                        type: integer
+                      option_id:
+                        type: integer
+      responses:
+        "200":
+          description: Tags generated
+  /discovery/groups:
+    get:
+      summary: List recruiting groups
+      parameters:
+        - in: query
+          name: route_type
+          schema:
+            type: string
+        - in: query
+          name: distance_type
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group list
+  /groups:
+    post:
+      summary: Create group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, target_count, city_code]
+              properties:
+                name:
+                  type: string
+                target_count:
+                  type: integer
+                  minimum: 30
+                  maximum: 100
+                city_code:
+                  type: string
+      responses:
+        "200":
+          description: Group created
+  /groups/{group_id}/join:
+    post:
+      summary: Join group
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Joined
+  /groups/{group_id}/vote/start:
+    post:
+      summary: Start route vote
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                duration_hours:
+                  type: integer
+                  minimum: 12
+                  maximum: 48
+      responses:
+        "200":
+          description: Vote created
+  /votes/{vote_id}/cast:
+    post:
+      summary: Cast vote
+      parameters:
+        - in: path
+          name: vote_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [option_id]
+              properties:
+                option_id:
+                  type: integer
+      responses:
+        "200":
+          description: Vote success
+  /orders/pay:
+    post:
+      summary: Create payment order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [group_id]
+              properties:
+                group_id:
+                  type: integer
+      responses:
+        "200":
+          description: Payment params generated
+  /payments/wechat/notify:
+    post:
+      summary: WeChat pay notify callback
+      responses:
+        "200":
+          description: Callback handled
+  /tickets/verify:
+    post:
+      summary: Verify ticket by qr code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ticket_code]
+              properties:
+                ticket_code:
+                  type: string
+      responses:
+        "200":
+          description: Verify result
+  /ratings:
+    post:
+      summary: Submit rating
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [group_id, mate_score, route_score, bus_score]
+              properties:
+                group_id:
+                  type: integer
+                mate_score:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                route_score:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                bus_score:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+                comment:
+                  type: string
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
