@@ -27,6 +27,8 @@ JWT_SECRET="${JWT_SECRET:-please_change_to_long_random_string}"
 APP_ENV="${APP_ENV:-prod}"
 APP_PORT="${APP_PORT:-8000}"
 WORKERS="${WORKERS:-2}"
+POETRY_VENV_PATH="${POETRY_VENV_PATH:-/opt/poetry-venv}"
+POETRY_BIN="${POETRY_BIN:-/usr/local/bin/poetry}"
 
 #######################################
 # Helpers
@@ -53,7 +55,12 @@ ensure_user_exists() {
 echo "==> Installing system dependencies"
 apt update
 apt install -y git curl wget vim ufw build-essential python3 python3-venv python3-pip nginx mysql-server redis-server
-pip3 install poetry
+if [[ ! -x "${POETRY_BIN}" ]]; then
+  python3 -m venv "${POETRY_VENV_PATH}"
+  "${POETRY_VENV_PATH}/bin/pip" install --upgrade pip
+  "${POETRY_VENV_PATH}/bin/pip" install poetry
+  ln -sf "${POETRY_VENV_PATH}/bin/poetry" "${POETRY_BIN}"
+fi
 
 #######################################
 # 2) Basic security
@@ -103,8 +110,8 @@ fi
 
 sudo -u "${APP_USER}" bash -lc "
   cd '${APP_DIR}' && \
-  poetry config virtualenvs.in-project true && \
-  poetry install
+  '${POETRY_BIN}' config virtualenvs.in-project true && \
+  '${POETRY_BIN}' install
 "
 
 #######################################
@@ -125,7 +132,7 @@ chmod 600 "${APP_DIR}/.env"
 # 7) DB migrations
 #######################################
 echo "==> Running Alembic migrations"
-sudo -u "${APP_USER}" bash -lc "cd '${APP_DIR}' && poetry run alembic upgrade head"
+sudo -u "${APP_USER}" bash -lc "cd '${APP_DIR}' && '${POETRY_BIN}' run alembic upgrade head"
 
 #######################################
 # 8) Systemd service
