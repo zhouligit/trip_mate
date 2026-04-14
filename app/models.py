@@ -125,3 +125,31 @@ class Payment(Base):
     notify_raw: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     paid_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp(), nullable=False)
+
+
+class Ticket(Base):
+    __tablename__ = "tickets"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    ticket_no: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    order_id: Mapped[int] = mapped_column(ForeignKey("orders.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), nullable=False)
+    qr_code: Mapped[str] = mapped_column(String(128), nullable=False)
+    status: Mapped[str] = mapped_column(String(16), nullable=False, default="issued")
+    verify_time: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp(), nullable=False)
+
+
+class Rating(Base):
+    __tablename__ = "ratings"
+    __table_args__ = (UniqueConstraint("group_id", "user_id", name="uk_group_user_rating"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    group_id: Mapped[int] = mapped_column(ForeignKey("groups.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    mate_score: Mapped[int] = mapped_column(nullable=False)
+    route_score: Mapped[int] = mapped_column(nullable=False)
+    bus_score: Mapped[int] = mapped_column(nullable=False)
+    comment: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp(), nullable=False)

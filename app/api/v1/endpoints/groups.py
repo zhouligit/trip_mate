@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
-from app.models import Group, GroupMember, User, Vote, VoteOption, VoteRecord
+from app.models import Group, GroupMember, Rating, User, Vote, VoteOption, VoteRecord
 from app.schemas.groups import CreateGroupRequest, StartVoteRequest
 
 router = APIRouter()
@@ -207,6 +207,28 @@ def vote_result_by_group(group_id: int, db: Session = Depends(get_db), user: Use
     stats = [{"option_id": row[0], "count": row[1]} for row in rows]
     winner_option_id = stats[0]["option_id"] if stats else None
     return {"vote_id": vote.id, "winner_option_id": winner_option_id, "stats": stats}
+
+
+@router.get("/{group_id}/ratings/summary")
+def group_ratings_summary(group_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> dict:
+    _ = user
+    group = db.get(Group, group_id)
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
+    rows = db.scalars(select(Rating).where(Rating.group_id == group_id)).all()
+    if not rows:
+        return {"group_id": group_id, "count": 0, "avg_mate_score": None, "avg_route_score": None, "avg_bus_score": None}
+    count = len(rows)
+    avg_mate = round(sum(item.mate_score for item in rows) / count, 2)
+    avg_route = round(sum(item.route_score for item in rows) / count, 2)
+    avg_bus = round(sum(item.bus_score for item in rows) / count, 2)
+    return {
+        "group_id": group_id,
+        "count": count,
+        "avg_mate_score": avg_mate,
+        "avg_route_score": avg_route,
+        "avg_bus_score": avg_bus,
+    }
 
 
 @router.get("/{group_id}/votes/sessions/current")

@@ -1,3 +1,18 @@
 # Python cache artifacts
 __pycache__/
 *.py[cod]
+
+# Python env and tool caches
+.venv/
+venv/
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
