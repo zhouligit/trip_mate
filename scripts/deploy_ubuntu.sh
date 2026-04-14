@@ -9,7 +9,7 @@ set -euo pipefail
 #######################################
 # Editable variables
 #######################################
-APP_USER="${APP_USER:-ubuntu}"
+APP_USER="${APP_USER:-${SUDO_USER:-ubuntu}}"
 APP_DIR="${APP_DIR:-/opt/trip_mate}"
 REPO_URL="${REPO_URL:-https://github.com/yourname/trip_mate.git}"
 BRANCH="${BRANCH:-main}"
@@ -85,10 +85,10 @@ systemctl enable --now mysql
 # 4) Redis setup
 #######################################
 echo "==> Configuring Redis"
-if ! rg -q "^bind 127\\.0\\.0\\.1" /etc/redis/redis.conf; then
+if ! grep -Eq "^bind 127\\.0\\.0\\.1" /etc/redis/redis.conf; then
   sed -i "s/^bind .*/bind 127.0.0.1 ::1/" /etc/redis/redis.conf
 fi
-if ! rg -q "^protected-mode yes" /etc/redis/redis.conf; then
+if ! grep -Eq "^protected-mode yes" /etc/redis/redis.conf; then
   sed -i "s/^protected-mode .*/protected-mode yes/" /etc/redis/redis.conf
 fi
 systemctl enable --now redis-server
