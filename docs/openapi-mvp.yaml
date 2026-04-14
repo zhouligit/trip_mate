@@ -1,11 +1,18 @@
 openapi: 3.0.3
 info:
   title: TripMate MVP API
-  version: 0.1.0
-  description: Core API draft for TripMate mini-program and ops admin.
+  version: 0.2.0
+  description: P0 aligned API draft for frontend integration.
 servers:
+  - url: https://api.tripmate.example.com/api
   - url: https://api.tripmate.example.com/api/v1
 paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Service healthy
   /auth/wechat/login:
     post:
       summary: WeChat login
@@ -22,9 +29,47 @@ paths:
       responses:
         "200":
           description: Login success
+  /auth/logout:
+    post:
+      summary: Logout current user
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Logout success
+  /users/me:
+    get:
+      summary: Get current user profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User profile
+    put:
+      summary: Update current user profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                avatar_url:
+                  type: string
+                mobile:
+                  type: string
+      responses:
+        "200":
+          description: User updated
   /users/personality-test:
     post:
       summary: Submit personality test
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -45,9 +90,31 @@ paths:
       responses:
         "200":
           description: Tags generated
+  /users/location:
+    post:
+      summary: Update user city and district
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [city_code]
+              properties:
+                city_code:
+                  type: string
+                district_code:
+                  type: string
+      responses:
+        "200":
+          description: Location updated
   /discovery/groups:
     get:
       summary: List recruiting groups
+      security:
+        - bearerAuth: []
       parameters:
         - in: query
           name: route_type
@@ -63,6 +130,8 @@ paths:
   /groups:
     post:
       summary: Create group
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -73,6 +142,10 @@ paths:
               properties:
                 name:
                   type: string
+                threshold_count:
+                  type: integer
+                  minimum: 30
+                  maximum: 50
                 target_count:
                   type: integer
                   minimum: 30
@@ -82,9 +155,39 @@ paths:
       responses:
         "200":
           description: Group created
+  /groups/my:
+    get:
+      summary: List my groups
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [created, joined]
+      responses:
+        "200":
+          description: My groups list
+  /groups/{group_id}:
+    get:
+      summary: Group detail
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Group detail
   /groups/{group_id}/join:
     post:
       summary: Join group
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: group_id
@@ -97,6 +200,8 @@ paths:
   /groups/{group_id}/vote/start:
     post:
       summary: Start route vote
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: group_id
@@ -117,9 +222,88 @@ paths:
       responses:
         "200":
           description: Vote created
+  /groups/{group_id}/votes/sessions:
+    post:
+      summary: Start vote session (frontend alias)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                duration_hours:
+                  type: integer
+                  minimum: 12
+                  maximum: 48
+      responses:
+        "200":
+          description: Vote session started
+  /groups/{group_id}/votes/sessions/current:
+    get:
+      summary: Get current vote session
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Current vote session
+  /groups/{group_id}/votes:
+    post:
+      summary: Vote by group context (frontend alias)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [routeId]
+              properties:
+                routeId:
+                  type: integer
+      responses:
+        "200":
+          description: Vote submitted
+  /groups/{group_id}/votes/result:
+    get:
+      summary: Vote result by group context (frontend alias)
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: group_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Vote result
   /votes/{vote_id}/cast:
     post:
       summary: Cast vote
+      security:
+        - bearerAuth: []
       parameters:
         - in: path
           name: vote_id
@@ -142,6 +326,8 @@ paths:
   /orders/pay:
     post:
       summary: Create payment order
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -155,12 +341,112 @@ paths:
       responses:
         "200":
           description: Payment params generated
+  /orders:
+    get:
+      summary: List current user orders
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Order list
+  /orders/{order_id}:
+    get:
+      summary: Get order detail
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Order detail
+  /orders/{order_id}/refund/apply:
+    post:
+      summary: Apply refund
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Refund applied
+  /orders/{order_id}/pay/wechat:
+    post:
+      summary: Create WeChat pay params for order
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: order_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: WeChat pay params generated
   /payments/wechat/notify:
     post:
       summary: WeChat pay notify callback
       responses:
         "200":
           description: Callback handled
+  /verification/me/status:
+    get:
+      summary: Get real-name verification status
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Verification status
+  /verification/wechat:
+    post:
+      summary: Verify by WeChat channel (MVP mock)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [real_name, id_no_last4]
+              properties:
+                real_name:
+                  type: string
+                id_no_last4:
+                  type: string
+      responses:
+        "200":
+          description: Verification success
+  /verification/idcard:
+    post:
+      summary: Verify by ID card channel (MVP mock)
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [id_number, name]
+              properties:
+                id_number:
+                  type: string
+                name:
+                  type: string
+                ocr_image_url:
+                  type: string
+      responses:
+        "200":
+          description: Verification success
   /tickets/verify:
     post:
       summary: Verify ticket by qr code

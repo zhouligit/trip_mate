@@ -9,6 +9,9 @@ class WechatLoginRequest(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
+    token: str
     token_type: str = "bearer"
     user_id: int
+    userId: int
     profile_completed: bool
+    isNewUser: bool
