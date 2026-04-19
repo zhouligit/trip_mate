@@ -47,6 +47,17 @@ class Group(Base):
     vote_deadline: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     group_deadline: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     trip_date: Mapped[date | None] = mapped_column(Date, nullable=True)
+    invite_code: Mapped[str | None] = mapped_column(String(32), unique=True, nullable=True)
+
+
+class Friendship(Base):
+    __tablename__ = "friendships"
+    __table_args__ = (UniqueConstraint("user_id", "friend_user_id", name="uk_user_friend"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    friend_user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.current_timestamp(), nullable=False)
 
 
 class GroupMember(Base):

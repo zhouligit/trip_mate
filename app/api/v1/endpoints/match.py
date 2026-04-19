@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.deps import get_current_user, get_db
-from app.models import User, UserProfile
+from app.models import Friendship, User, UserProfile
 
 router = APIRouter()
 
@@ -16,6 +16,8 @@ def get_recommendations(
     me_profile = db.scalar(select(UserProfile).where(UserProfile.user_id == user.id))
     me_city = me_profile.city_code if me_profile else None
     me_tags = set((me_profile.tags_json or {}).get("tags", [])) if me_profile else set()
+    friend_ids = db.scalars(select(Friendship.friend_user_id).where(Friendship.user_id == user.id)).all()
+    friend_set = set(friend_ids)
 
     rows = db.execute(
         select(User, UserProfile)
@@ -26,6 +28,8 @@ def get_recommendations(
 
     candidates = []
     for u, p in rows:
+        if u.id in friend_set:
+            continue
         tags = set((p.tags_json or {}).get("tags", []))
         overlap = len(me_tags.intersection(tags))
         score = min(100, 60 + overlap * 10 + (10 if me_city and p.city_code == me_city else 0))

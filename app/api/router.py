@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from app.api.v1.endpoints import admin, auth, discovery, dna, groups, health, match, orders, payments, ratings, tickets, users, verification, votes
+from app.api.v1.endpoints import admin, auth, discovery, dna, friends, groups, health, match, orders, payments, ratings, tickets, users, verification, votes
 
 api_router = APIRouter()
 
@@ -9,6 +9,7 @@ def register_routes(router: APIRouter) -> None:
     router.include_router(health.router, tags=["health"])
     router.include_router(auth.router, prefix="/auth", tags=["auth"])
     router.include_router(users.router, prefix="/users", tags=["users"])
+    router.include_router(friends.router, prefix="/friends", tags=["friends"])
     router.include_router(dna.router, prefix="/dna", tags=["dna"])
     router.include_router(match.router, prefix="/match", tags=["match"])
     router.include_router(discovery.router, prefix="/discovery", tags=["discovery"])

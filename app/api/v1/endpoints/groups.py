@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
+import secrets
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
@@ -14,6 +15,41 @@ router = APIRouter()
 
 class CastGroupVoteRequest(BaseModel):
     routeId: int
+
+
+class JoinByInviteRequest(BaseModel):
+    invite_code: str = Field(min_length=4, max_length=32)
+
+
+def _new_invite_code() -> str:
+    return secrets.token_urlsafe(12).replace("-", "")[:24]
+
+
+@router.post("/join-by-invite")
+def join_by_invite(
+    payload: JoinByInviteRequest,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    code = payload.invite_code.strip()
+    group = db.scalar(select(Group).where(Group.invite_code == code))
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Invalid invite code")
+
+    count_stmt = select(func.count(GroupMember.id)).where(GroupMember.group_id == group.id)
+    current_count = db.scalar(count_stmt) or 0
+    if current_count >= group.target_count:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Group is full")
+
+    member = db.scalar(
+        select(GroupMember).where(GroupMember.group_id == group.id, GroupMember.user_id == user.id)
+    )
+    if member:
+        return {"group_id": group.id, "joined": True}
+
+    db.add(GroupMember(group_id=group.id, user_id=user.id, role="member"))
+    db.commit()
+    return {"group_id": group.id, "joined": True}
 
 
 @router.post("")
@@ -32,9 +68,34 @@ def create_group(
     )
     db.add(group)
     db.flush()
+    group.invite_code = _new_invite_code()
     db.add(GroupMember(group_id=group.id, user_id=user.id, role="owner"))
     db.commit()
-    return {"group_id": group.id, "status": group.status}
+    return {"group_id": group.id, "status": group.status, "invite_code": group.invite_code}
+
+
+@router.get("/{group_id:int}/invite")
+def get_group_invite_link(
+    group_id: int,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> dict:
+    group = db.get(Group, group_id)
+    if not group:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Group not found")
+    if group.owner_user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only owner can view invite link")
+    if not group.invite_code:
+        group.invite_code = _new_invite_code()
+        db.commit()
+        db.refresh(group)
+    path = f"/pages/group/join?code={group.invite_code}"
+    return {
+        "group_id": group.id,
+        "invite_code": group.invite_code,
+        "invite_path": path,
+        "hint": "前端可将 invite_path 配为小程序页面路径；好友打开后携带 code 调用 POST /api/groups/join-by-invite",
+    }
 
 
 @router.get("/{group_id:int}")
