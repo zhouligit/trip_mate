@@ -1,5 +1,6 @@
 # Python cache artifacts
 __pycache__/
+*.pyc
 *.py[cod]
 
 # Python env and tool caches
