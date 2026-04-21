@@ -6,7 +6,7 @@
 
 - Base URL 同时支持：
   - `/api`
-  - `/api/v1`
+  - `/api/v1/wm`
 - 鉴权：除登录、支付回调、健康检查、DNA题库外，均需
   - `Authorization: Bearer <token>`
 - 当前响应格式：**直接返回 JSON 对象**（暂未统一包裹 `code/message/data`）
@@ -15,7 +15,7 @@
 
 ## 1. 健康检查
 
-### `GET /api/health`
+### `GET /api/v1/wm/health`
 
 ### 请求参数
 
@@ -24,7 +24,7 @@
 ### 请求示例
 
 ```http
-GET /api/health HTTP/1.1
+GET /api/v1/wm/health HTTP/1.1
 Host: www.wang-hao-hao.cn
 ```
 
@@ -42,7 +42,7 @@ Host: www.wang-hao-hao.cn
 
 ## 2.1 微信登录
 
-### `POST /api/auth/wechat/login`
+### `POST /api/v1/wm/auth/wechat/login`
 
 ### 请求参数
 
@@ -65,7 +65,7 @@ Host: www.wang-hao-hao.cn
 ### 请求示例
 
 ```http
-POST /api/auth/wechat/login HTTP/1.1
+POST /api/v1/wm/auth/wechat/login HTTP/1.1
 Host: www.wang-hao-hao.cn
 Content-Type: application/json
 ```
@@ -100,7 +100,7 @@ Content-Type: application/json
 
 ## 2.2 退出登录
 
-### `POST /api/auth/logout`
+### `POST /api/v1/wm/auth/logout`
 
 ### 请求参数
 
@@ -109,7 +109,7 @@ Content-Type: application/json
 ### 请求示例
 
 ```http
-POST /api/auth/logout HTTP/1.1
+POST /api/v1/wm/auth/logout HTTP/1.1
 Host: www.wang-hao-hao.cn
 Authorization: Bearer <token>
 ```
@@ -126,7 +126,7 @@ Authorization: Bearer <token>
 
 ## 2.3 获取当前用户信息
 
-### `GET /api/users/me`
+### `GET /api/v1/wm/users/me`
 
 ### 响应字段
 
@@ -156,7 +156,7 @@ Authorization: Bearer <token>
 
 ## 2.4 更新当前用户信息
 
-### `PUT /api/users/me`
+### `PUT /api/v1/wm/users/me`
 
 ### 请求参数
 
@@ -189,7 +189,7 @@ Authorization: Bearer <token>
 
 ## 2.5 更新定位
 
-### `POST /api/users/location`
+### `POST /api/v1/wm/users/location`
 
 ### 请求参数
 
@@ -222,7 +222,7 @@ Authorization: Bearer <token>
 
 ## 3.1 获取题库
 
-### `GET /api/dna/questions`
+### `GET /api/v1/wm/dna/questions`
 
 ### 请求参数
 
@@ -255,7 +255,7 @@ Authorization: Bearer <token>
 
 ## 3.2 提交 DNA（推荐路径）
 
-### `POST /api/dna/submissions`
+### `POST /api/v1/wm/dna/submissions`
 
 ### 请求参数
 
@@ -308,7 +308,7 @@ Authorization: Bearer <token>
 
 ## 3.3 获取最近一次 DNA
 
-### `GET /api/dna/me/latest`
+### `GET /api/v1/wm/dna/me/latest`
 
 ### 响应示例
 
@@ -324,9 +324,9 @@ Authorization: Bearer <token>
 
 ## 3.4 提交人格测试（兼容路径）
 
-### `POST /api/users/personality-test`
+### `POST /api/v1/wm/users/personality-test`
 
-说明：与 `POST /api/dna/submissions` 类似，响应为：
+说明：与 `POST /api/v1/wm/dna/submissions` 类似，响应为：
 
 ```json
 {
@@ -340,7 +340,7 @@ Authorization: Bearer <token>
 
 ## 4.1 获取推荐列表
 
-### `GET /api/match/recommendations`
+### `GET /api/v1/wm/match/recommendations`
 
 ### 响应字段
 
@@ -382,7 +382,7 @@ Authorization: Bearer <token>
 
 ## 5.1 发现页群组
 
-### `GET /api/discovery/groups`
+### `GET /api/v1/wm/discovery/groups`
 
 ### 响应示例
 
@@ -404,7 +404,7 @@ Authorization: Bearer <token>
 
 ## 5.2 创建群组
 
-### `POST /api/groups`
+### `POST /api/v1/wm/groups`
 
 ### 请求参数
 
@@ -428,7 +428,7 @@ Authorization: Bearer <token>
 
 ## 5.3 群详情
 
-### `GET /api/groups/{group_id}`
+### `GET /api/v1/wm/groups/{group_id}`
 
 ### 响应示例
 
@@ -449,7 +449,7 @@ Authorization: Bearer <token>
 
 ## 5.4 我的群组
 
-### `GET /api/groups/my?type=created|joined`
+### `GET /api/v1/wm/groups/my?type=created|joined`
 
 ### 响应示例
 
@@ -470,7 +470,7 @@ Authorization: Bearer <token>
 
 ## 5.5 加入群组
 
-### `POST /api/groups/{group_id}/join`
+### `POST /api/v1/wm/groups/{group_id}/join`
 
 ### 响应示例
 
@@ -487,7 +487,7 @@ Authorization: Bearer <token>
 
 ## 6.1 发起投票
 
-### `POST /api/groups/{group_id}/vote/start`
+### `POST /api/v1/wm/groups/{group_id}/vote/start`
 
 ### 请求参数
 
@@ -508,7 +508,7 @@ Authorization: Bearer <token>
 
 ## 6.2 发起投票（前端别名）
 
-### `POST /api/groups/{group_id}/votes/sessions`
+### `POST /api/v1/wm/groups/{group_id}/votes/sessions`
 
 说明：等价于 `/vote/start`
 
@@ -516,7 +516,7 @@ Authorization: Bearer <token>
 
 ## 6.3 当前投票会话
 
-### `GET /api/groups/{group_id}/votes/sessions/current`
+### `GET /api/v1/wm/groups/{group_id}/votes/sessions/current`
 
 ### 响应示例
 
@@ -536,7 +536,7 @@ Authorization: Bearer <token>
 
 ## 6.4 投票（group 维度）
 
-### `POST /api/groups/{group_id}/votes`
+### `POST /api/v1/wm/groups/{group_id}/votes`
 
 ### 请求参数
 
@@ -557,7 +557,7 @@ Authorization: Bearer <token>
 
 ## 6.5 投票结果（group 维度）
 
-### `GET /api/groups/{group_id}/votes/result`
+### `GET /api/v1/wm/groups/{group_id}/votes/result`
 
 ### 响应示例
 
@@ -575,7 +575,7 @@ Authorization: Bearer <token>
 
 ## 6.6 投票（vote 维度）
 
-### `POST /api/votes/{vote_id}/cast`
+### `POST /api/v1/wm/votes/{vote_id}/cast`
 
 ### 请求参数
 
@@ -587,7 +587,7 @@ Authorization: Bearer <token>
 
 ## 6.7 投票结果（vote 维度）
 
-### `GET /api/votes/{vote_id}/result`
+### `GET /api/v1/wm/votes/{vote_id}/result`
 
 响应结构同上。
 
@@ -597,7 +597,7 @@ Authorization: Bearer <token>
 
 ## 7.1 查询实名状态
 
-### `GET /api/verification/me/status`
+### `GET /api/v1/wm/verification/me/status`
 
 ### 响应示例
 
@@ -613,7 +613,7 @@ Authorization: Bearer <token>
 
 ## 7.2 微信实名（MVP mock）
 
-### `POST /api/verification/wechat`
+### `POST /api/v1/wm/verification/wechat`
 
 ### 请求参数
 
@@ -636,7 +636,7 @@ Authorization: Bearer <token>
 
 ## 7.3 身份证实名（MVP mock）
 
-### `POST /api/verification/idcard`
+### `POST /api/v1/wm/verification/idcard`
 
 ### 请求参数
 
@@ -652,7 +652,7 @@ Authorization: Bearer <token>
 
 ## 8.1 创建订单
 
-### `POST /api/orders`
+### `POST /api/v1/wm/orders`
 
 ### 请求参数
 
@@ -675,15 +675,15 @@ Authorization: Bearer <token>
 
 ## 8.2 创建订单+拉起支付（兼容）
 
-### `POST /api/orders/pay`
+### `POST /api/v1/wm/orders/pay`
 
-返回结构同 `POST /api/orders/{order_id}/pay/wechat`。
+返回结构同 `POST /api/v1/wm/orders/{order_id}/pay/wechat`。
 
 ---
 
 ## 8.3 获取微信支付参数（mock）
 
-### `POST /api/orders/{order_id}/pay/wechat`
+### `POST /api/v1/wm/orders/{order_id}/pay/wechat`
 
 ### 响应示例
 
@@ -706,7 +706,7 @@ Authorization: Bearer <token>
 
 ## 8.4 订单列表
 
-### `GET /api/orders`
+### `GET /api/v1/wm/orders`
 
 ### 响应示例
 
@@ -728,7 +728,7 @@ Authorization: Bearer <token>
 
 ## 8.5 订单详情
 
-### `GET /api/orders/{order_id}`
+### `GET /api/v1/wm/orders/{order_id}`
 
 ### 响应示例
 
@@ -749,7 +749,7 @@ Authorization: Bearer <token>
 
 ## 8.6 申请退款
 
-### `POST /api/orders/{order_id}/refund/apply`
+### `POST /api/v1/wm/orders/{order_id}/refund/apply`
 
 ### 响应示例
 
@@ -764,7 +764,7 @@ Authorization: Bearer <token>
 
 ## 8.7 微信支付回调（服务端回调）
 
-### `POST /api/payments/wechat/notify`
+### `POST /api/v1/wm/payments/wechat/notify`
 
 ### 请求参数
 
@@ -788,7 +788,7 @@ Authorization: Bearer <token>
 
 ## 9.1 生成虚拟票
 
-### `POST /api/tickets/generate`
+### `POST /api/v1/wm/tickets/generate`
 
 ### 请求参数
 
@@ -811,7 +811,7 @@ Authorization: Bearer <token>
 
 ## 9.2 核销虚拟票
 
-### `POST /api/tickets/verify`
+### `POST /api/v1/wm/tickets/verify`
 
 ### 请求参数
 
@@ -835,7 +835,7 @@ Authorization: Bearer <token>
 
 ## 10.1 提交评分
 
-### `POST /api/ratings`
+### `POST /api/v1/wm/ratings`
 
 ### 请求参数
 
@@ -860,7 +860,7 @@ Authorization: Bearer <token>
 
 ## 10.2 群组评分汇总
 
-### `GET /api/groups/{group_id}/ratings/summary`
+### `GET /api/v1/wm/groups/{group_id}/ratings/summary`
 
 ### 响应示例
 
@@ -880,7 +880,7 @@ Authorization: Bearer <token>
 
 ## 11.1 指派车辆
 
-### `POST /api/admin/groups/{group_id}/assign-bus`
+### `POST /api/v1/wm/admin/groups/{group_id}/assign-bus`
 
 ### 当前状态
 

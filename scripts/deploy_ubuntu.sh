@@ -189,9 +189,9 @@ systemctl status tripmate-api --no-pager || true
 systemctl status nginx --no-pager || true
 systemctl status mysql --no-pager || true
 systemctl status redis-server --no-pager || true
-curl -sS "http://127.0.0.1/api/v1/health" || true
+curl -sS "http://127.0.0.1/api/v1/wm/health" || true
 
 echo ""
 echo "Deployment completed."
 echo "Swagger: http://<your_server_ip>/docs"
-echo "Health:  http://<your_server_ip>/api/v1/health"
+echo "Health:  http://<your_server_ip>/api/v1/wm/health"
