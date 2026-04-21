@@ -19,7 +19,7 @@ HOST="https://www.wang-hao-hao.cn"
 ## 1. 健康检查
 
 ```bash
-curl -s "$HOST/api/v1/wm/health"
+curl -s "$HOST/api/v1/tm/health"
 ```
 
 ---
@@ -27,7 +27,7 @@ curl -s "$HOST/api/v1/wm/health"
 ## 2. 登录拿 Token
 
 ```bash
-LOGIN=$(curl -s -X POST "$HOST/api/v1/wm/auth/wechat/login" \
+LOGIN=$(curl -s -X POST "$HOST/api/v1/tm/auth/wechat/login" \
   -H "Content-Type: application/json" \
   -d '{"code":"demo_001","nickname":"tester_a"}')
 
@@ -45,14 +45,14 @@ echo "USER_ID=$USER_ID"
 ### 3.1 获取当前用户
 
 ```bash
-curl -s "$HOST/api/v1/wm/users/me" \
+curl -s "$HOST/api/v1/tm/users/me" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 3.2 更新用户信息
 
 ```bash
-curl -s -X PUT "$HOST/api/v1/wm/users/me" \
+curl -s -X PUT "$HOST/api/v1/tm/users/me" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"mobile":"13800000000"}' | jq
@@ -61,13 +61,13 @@ curl -s -X PUT "$HOST/api/v1/wm/users/me" \
 ### 3.3 DNA 题库
 
 ```bash
-curl -s "$HOST/api/v1/wm/dna/questions" | jq
+curl -s "$HOST/api/v1/tm/dna/questions" | jq
 ```
 
 ### 3.4 提交 DNA
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/dna/submissions" \
+curl -s -X POST "$HOST/api/v1/tm/dna/submissions" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -84,7 +84,7 @@ curl -s -X POST "$HOST/api/v1/wm/dna/submissions" \
 ### 3.5 获取最新 DNA
 
 ```bash
-curl -s "$HOST/api/v1/wm/dna/me/latest" \
+curl -s "$HOST/api/v1/tm/dna/me/latest" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -95,7 +95,7 @@ curl -s "$HOST/api/v1/wm/dna/me/latest" \
 ### 4.1 更新定位
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/users/location" \
+curl -s -X POST "$HOST/api/v1/tm/users/location" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"city_code":"chengdu","district_code":"jinjiang"}' | jq
@@ -104,14 +104,14 @@ curl -s -X POST "$HOST/api/v1/wm/users/location" \
 ### 4.2 旅伴推荐
 
 ```bash
-curl -s "$HOST/api/v1/wm/match/recommendations" \
+curl -s "$HOST/api/v1/tm/match/recommendations" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 4.3 发现页群组
 
 ```bash
-curl -s "$HOST/api/v1/wm/discovery/groups" \
+curl -s "$HOST/api/v1/tm/discovery/groups" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -122,14 +122,14 @@ curl -s "$HOST/api/v1/wm/discovery/groups" \
 ### 5.1 查看状态
 
 ```bash
-curl -s "$HOST/api/v1/wm/verification/me/status" \
+curl -s "$HOST/api/v1/tm/verification/me/status" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 5.2 微信实名
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/verification/wechat" \
+curl -s -X POST "$HOST/api/v1/tm/verification/wechat" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"real_name":"张三","id_no_last4":"1234"}' | jq
@@ -138,7 +138,7 @@ curl -s -X POST "$HOST/api/v1/wm/verification/wechat" \
 ### 5.3 再次查看状态
 
 ```bash
-curl -s "$HOST/api/v1/wm/verification/me/status" \
+curl -s "$HOST/api/v1/tm/verification/me/status" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -149,7 +149,7 @@ curl -s "$HOST/api/v1/wm/verification/me/status" \
 ### 6.1 创建群组
 
 ```bash
-CREATE_GROUP=$(curl -s -X POST "$HOST/api/v1/wm/groups" \
+CREATE_GROUP=$(curl -s -X POST "$HOST/api/v1/tm/groups" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"name":"周末轻户外群","city_code":"chengdu","target_count":30,"threshold_count":30}')
@@ -162,21 +162,21 @@ echo "GROUP_ID=$GROUP_ID"
 ### 6.2 我的群组
 
 ```bash
-curl -s "$HOST/api/v1/wm/groups/my?type=created" \
+curl -s "$HOST/api/v1/tm/groups/my?type=created" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 6.3 群详情
 
 ```bash
-curl -s "$HOST/api/v1/wm/groups/$GROUP_ID" \
+curl -s "$HOST/api/v1/tm/groups/$GROUP_ID" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 6.4 发起投票
 
 ```bash
-START_VOTE=$(curl -s -X POST "$HOST/api/v1/wm/groups/$GROUP_ID/vote/start" \
+START_VOTE=$(curl -s -X POST "$HOST/api/v1/tm/groups/$GROUP_ID/vote/start" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"duration_hours":24}')
@@ -189,7 +189,7 @@ echo "VOTE_ID=$VOTE_ID"
 ### 6.5 当前投票会话
 
 ```bash
-CURRENT=$(curl -s "$HOST/api/v1/wm/groups/$GROUP_ID/votes/sessions/current" \
+CURRENT=$(curl -s "$HOST/api/v1/tm/groups/$GROUP_ID/votes/sessions/current" \
   -H "Authorization: Bearer $TOKEN")
 
 echo "$CURRENT" | jq
@@ -200,7 +200,7 @@ echo "ROUTE_ID=$ROUTE_ID"
 ### 6.6 投票（组内路径）
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/groups/$GROUP_ID/votes" \
+curl -s -X POST "$HOST/api/v1/tm/groups/$GROUP_ID/votes" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"routeId\":$ROUTE_ID}" | jq
@@ -209,7 +209,7 @@ curl -s -X POST "$HOST/api/v1/wm/groups/$GROUP_ID/votes" \
 ### 6.7 投票结果
 
 ```bash
-curl -s "$HOST/api/v1/wm/groups/$GROUP_ID/votes/result" \
+curl -s "$HOST/api/v1/tm/groups/$GROUP_ID/votes/result" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -220,7 +220,7 @@ curl -s "$HOST/api/v1/wm/groups/$GROUP_ID/votes/result" \
 ### 7.1 创建订单
 
 ```bash
-CREATE_ORDER=$(curl -s -X POST "$HOST/api/v1/wm/orders" \
+CREATE_ORDER=$(curl -s -X POST "$HOST/api/v1/tm/orders" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"group_id\":$GROUP_ID}")
@@ -233,7 +233,7 @@ echo "ORDER_ID=$ORDER_ID"
 ### 7.2 拉起微信支付参数（mock）
 
 ```bash
-PAY=$(curl -s -X POST "$HOST/api/v1/wm/orders/$ORDER_ID/pay/wechat" \
+PAY=$(curl -s -X POST "$HOST/api/v1/tm/orders/$ORDER_ID/pay/wechat" \
   -H "Authorization: Bearer $TOKEN")
 
 echo "$PAY" | jq
@@ -244,7 +244,7 @@ echo "OUT_TRADE_NO=$OUT_TRADE_NO"
 ### 7.3 支付回调（mock）
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/payments/wechat/notify" \
+curl -s -X POST "$HOST/api/v1/tm/payments/wechat/notify" \
   -H "Content-Type: application/json" \
   -d "{\"out_trade_no\":\"$OUT_TRADE_NO\",\"wechat_txn_id\":\"wx_txn_001\",\"success\":true}" | jq
 ```
@@ -252,17 +252,17 @@ curl -s -X POST "$HOST/api/v1/wm/payments/wechat/notify" \
 ### 7.4 订单详情与列表
 
 ```bash
-curl -s "$HOST/api/v1/wm/orders/$ORDER_ID" \
+curl -s "$HOST/api/v1/tm/orders/$ORDER_ID" \
   -H "Authorization: Bearer $TOKEN" | jq
 
-curl -s "$HOST/api/v1/wm/orders" \
+curl -s "$HOST/api/v1/tm/orders" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 ### 7.5 退款申请
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/orders/$ORDER_ID/refund/apply" \
+curl -s -X POST "$HOST/api/v1/tm/orders/$ORDER_ID/refund/apply" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -273,7 +273,7 @@ curl -s -X POST "$HOST/api/v1/wm/orders/$ORDER_ID/refund/apply" \
 ### 8.1 生成虚拟票
 
 ```bash
-TICKET=$(curl -s -X POST "$HOST/api/v1/wm/tickets/generate" \
+TICKET=$(curl -s -X POST "$HOST/api/v1/tm/tickets/generate" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"order_id\":$ORDER_ID}")
@@ -286,7 +286,7 @@ echo "TICKET_CODE=$TICKET_CODE"
 ### 8.2 核销车票
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/tickets/verify" \
+curl -s -X POST "$HOST/api/v1/tm/tickets/verify" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"ticket_code\":\"$TICKET_CODE\"}" | jq
@@ -295,7 +295,7 @@ curl -s -X POST "$HOST/api/v1/wm/tickets/verify" \
 ### 8.3 提交评分
 
 ```bash
-curl -s -X POST "$HOST/api/v1/wm/ratings" \
+curl -s -X POST "$HOST/api/v1/tm/ratings" \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d "{\"group_id\":$GROUP_ID,\"mate_score\":5,\"route_score\":4,\"bus_score\":5,\"comment\":\"nice\"}" | jq
@@ -304,7 +304,7 @@ curl -s -X POST "$HOST/api/v1/wm/ratings" \
 ### 8.4 评分汇总
 
 ```bash
-curl -s "$HOST/api/v1/wm/groups/$GROUP_ID/ratings/summary" \
+curl -s "$HOST/api/v1/tm/groups/$GROUP_ID/ratings/summary" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
@@ -313,7 +313,7 @@ curl -s "$HOST/api/v1/wm/groups/$GROUP_ID/ratings/summary" \
 ## 9. 常见问题
 
 - `401 Unauthorized`：Token 缺失或过期，重新登录获取新 token。
-- `404 Not Found`：路径不对，确认是否使用 `/api/v1/wm` 前缀。
+- `404 Not Found`：路径不对，确认是否使用 `/api/v1/tm` 前缀。
 - `500 Internal Server Error`：优先看服务日志：
   - `journalctl -u tripmate-api -f`
 - 支付流程异常：先确认支付回调接口入参 `out_trade_no` 是否来自 `/orders/{id}/pay/wechat` 的返回值。

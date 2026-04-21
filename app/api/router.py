@@ -23,6 +23,6 @@ def register_routes(router: APIRouter) -> None:
     router.include_router(admin.router, prefix="/admin", tags=["admin"])
 
 
-wm_v1_router = APIRouter(prefix="/v1/wm")
-register_routes(wm_v1_router)
-api_router.include_router(wm_v1_router)
+tm_v1_router = APIRouter(prefix="/v1/tm")
+register_routes(tm_v1_router)
+api_router.include_router(tm_v1_router)
